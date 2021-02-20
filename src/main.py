@@ -118,21 +118,23 @@ def posts(id = None):
 
    
     if request.method == 'POST':
-        user_id = request.json.get("user_id")
+        name = request.json.get("name")
         commentary = request.json.get("commentary")
+        user_id = request.json.get("user_id")
         
-        
+        if not name: return jsonify({"msg": "name is required"}), 400
         if not commentary: return jsonify({"msg": "commentary is required"}), 400
         if not user_id: return jsonify({"msg": "commentary is required"}), 400
 
         post = Post()
-        post.user_id = user_id
+        post.name = name
         post.commentary = commentary
+        post.user_id = user_id
         post.save()
 
         return jsonify(post.serialize()), 201
 
-    if request.method == 'PUT':
+    """ if request.method == 'PUT':
         commentary = request.json.get("commentary")
         user_id = request.json.get("user_id")
 
@@ -146,7 +148,7 @@ def posts(id = None):
         post.update()
 
                 
-        return jsonify(post.serialize()), 200   
+        return jsonify(post.serialize()), 200    """
 
     if request.method == 'DELETE':
         post = Post.query.get(id)

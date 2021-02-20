@@ -56,12 +56,14 @@ class Chat(db.Model):
 class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
+    name=db.Column(db.String(120), unique=False, nullable=False)
     commentary=db.Column(db.String(120))
     user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False) 
 
     def serialize(self):
         return {
             "id": self.id,
+            "name": self.name,
             "commentary": self.commentary,
             "user_id": self.user_id
         }
