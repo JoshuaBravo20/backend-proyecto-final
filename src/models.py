@@ -6,9 +6,9 @@ class User(db.Model):
     __tablename__ = 'user'
     user_id=db.Column(db.String(100), primary_key=True)
     name=db.Column(db.String(120), unique=False, nullable=False)
-    email=db.Column(db.String(120), unique=True, nullable=False)
+    email=db.Column(db.String(120), unique=False, nullable=False)
     followers=db.Column(db.Integer, nullable=True)
-    """ chats = db.relationship('Chat', backref='user') """
+    posts = db.relationship('Chat', backref='user')
 
     def serialize(self):
         return {
@@ -49,7 +49,7 @@ class User(db.Model):
 
     def delete(self):
         db.session.delete(self)
-        db.session.commit()
+        db.session.commit() """
     
 class Post(db.Model):
     __tablename__ = 'posts'
@@ -72,4 +72,4 @@ class Post(db.Model):
 
     def delete(self):
         db.session.delete(self)
-        db.session.commit() """
+        db.session.commit()

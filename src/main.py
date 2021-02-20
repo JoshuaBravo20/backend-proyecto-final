@@ -36,7 +36,7 @@ def sitemap():
     return generate_sitemap(app)
 
 @app.route('/api/users', methods=['GET', 'POST'])
-@app.route('/api/user/<int:id>', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/api/user/<string:id>', methods=['GET', 'PUT', 'DELETE'])
 def user(id = None):
     if request.method == 'GET':
         if id is not None:
@@ -59,8 +59,8 @@ def user(id = None):
         if not name: return jsonify({"msg": "name is required"}), 400
         if not email: return jsonify({"msg": "email is required"}), 400
 
-        """ user = User.query.filter_by(email=email).first()
-        if user: return jsonify({"msg": "email already exists"}), 400 """
+        user2 = User.query.filter_by(email=email).first()
+        if user2: return jsonify({"msg": "email already exists"}), 400
 
         user = User()
         user.user_id = user_id
@@ -72,20 +72,23 @@ def user(id = None):
 
     if request.method == 'PUT':
         name = request.json.get("name")
-        email = request.json.get("name")
+        email = request.json.get("email")
         followers = request.json.get("followers")
+        print(followers)
 
         if not name: return jsonify({"msg": "name is required"}), 400
         if not email: return jsonify({"msg": "email is required"}), 400
 
-        user = User.query.filter_by(email=email).first()
-        if user and user.id != id: return jsonify({"msg": "email already exists"}), 400
 
         user = User.query.get(id)
         user.name = name
         user.email = email
         user.followers = followers
         user.update()
+
+        user2 = User.query.filter_by(email=email).first()
+        if user2 and user2.user_id != id: return jsonify({"msg": "email already exists"}), 400
+        
         return jsonify(user.serialize()), 200    
 
     if request.method == 'DELETE':
