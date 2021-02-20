@@ -9,7 +9,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Post
+from models import db, User, Post, Chat
 #from models import Person
 
 app = Flask(__name__)
@@ -157,7 +157,7 @@ def posts(id = None):
     
 @app.route('/api/chats', methods=['GET', 'POST'])
 @app.route('/api/chat/<string:id>', methods=['GET', 'PUT', 'DELETE'])
-def posts(id = None):
+def chats(id = None):
     if request.method == 'GET':
         if id is not None:
             chat = Chat.query.get(id)
@@ -165,7 +165,7 @@ def posts(id = None):
             return jsonify(chat.serialize()), 200
         else:
             chat = Chat.query.all()
-            chat = list(map(lambda post: chat.serialize(), chat))
+            chat = list(map(lambda chat: chat.serialize(), chat))
             return jsonify(chat), 200
 
    
