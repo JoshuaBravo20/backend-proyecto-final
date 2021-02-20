@@ -118,37 +118,77 @@ def posts(id = None):
 
    
     if request.method == 'POST':
-        commentary = request.json.get("commentary")
         user_id = request.json.get("user_id")
+        commentary = request.json.get("commentary")
         
         
         if not commentary: return jsonify({"msg": "commentary is required"}), 400
         if not user_id: return jsonify({"msg": "commentary is required"}), 400
 
         post = Post()
-        post.commentary = commentary
         post.user_id = user_id
+        post.commentary = commentary
         post.save()
+
         return jsonify(post.serialize()), 201
 
     if request.method == 'PUT':
         commentary = request.json.get("commentary")
+        user_id = request.json.get("user_id")
 
         if not commentary: return jsonify({"msg": "Commentary is required"}), 400
+        if not user_id: return jsonify({"msg": "Commentary is required"}), 400
 
 
         post = Post.query.get(id)
         post.commentary = commentary
+        post.user_id = user_id
         post.update()
 
                 
-        return jsonify(post.serialize()), 200    
+        return jsonify(post.serialize()), 200   
 
     if request.method == 'DELETE':
         post = Post.query.get(id)
-        if not post: return jsonify({"msg": "Commentary not found"}), 404
+        if not post: return jsonify({"msg": "Post not found"}), 404
         post.delete()
-        return jsonify({"result": "Commentary has deleted"}), 200
+        return jsonify({"result": "Post has deleted"}), 200 
+
+    
+@app.route('/api/chats', methods=['GET', 'POST'])
+@app.route('/api/chat/<string:id>', methods=['GET', 'PUT', 'DELETE'])
+def posts(id = None):
+    if request.method == 'GET':
+        if id is not None:
+            chat = Chat.query.get(id)
+            if not chat: return jsonify({"msg": "chat not found"}), 404
+            return jsonify(chat.serialize()), 200
+        else:
+            chat = Chat.query.all()
+            chat = list(map(lambda post: chat.serialize(), chat))
+            return jsonify(chat), 200
+
+   
+    if request.method == 'POST':
+        user_id = request.json.get("user_id")
+        message = request.json.get("message")
+        
+        
+        if not message: return jsonify({"msg": "message is required"}), 400
+        if not user_id: return jsonify({"msg": "message is required"}), 400
+
+        chat = Chat()
+        chat.user_id = user_id
+        chat.message = message
+        chat.save()
+
+        return jsonify(chat.serialize()), 201
+   
+    if request.method == 'DELETE':
+        chat = Chat.query.get(id)
+        if not chat: return jsonify({"msg": "Chat not found"}), 404
+        chat.delete()
+        return jsonify({"result": "Chat has deleted"}), 200
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':

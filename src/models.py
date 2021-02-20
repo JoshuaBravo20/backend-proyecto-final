@@ -9,6 +9,7 @@ class User(db.Model):
     email=db.Column(db.String(120), unique=False, nullable=False)
     followers=db.Column(db.Integer, nullable=True)
     posts = db.relationship('Post', backref='user')
+    chats = db.relationship('Chat', backref='user')
 
     def serialize(self):
         return {
@@ -28,17 +29,18 @@ class User(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-""" class Chat(db.Model):
+class Chat(db.Model):
 
     __tablename__ = 'chats'
     id = db.Column(db.Integer, primary_key=True)
-    message = db.Column(db.String(100), nullable=False)
-    users_id = db.Column(db.String(100), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False) 
+    message = db.Column(db.String(100))
+    user_id = db.Column(db.String(100), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False) 
 
     def serialize(self):
         return {
             "id": self.id,
-            "message": self.message
+            "message": self.message,
+            "user_id": self.user_id
         }
 
     def save(self):
@@ -50,19 +52,19 @@ class User(db.Model):
 
     def delete(self):
         db.session.delete(self)
-        db.session.commit() """
+        db.session.commit()
     
 class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
-    commentary=db.Column(db.String(120), nullable=False)
+    commentary=db.Column(db.String(120))
     user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False) 
 
     def serialize(self):
         return {
             "id": self.id,
-            "user_id": self.user_id,
-            "commentary": self.commentary
+            "commentary": self.commentary,
+            "user_id": self.user_id
         }
 
     def save(self):
