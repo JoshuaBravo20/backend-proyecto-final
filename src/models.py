@@ -8,7 +8,7 @@ class User(db.Model):
     name=db.Column(db.String(120), unique=False, nullable=False)
     email=db.Column(db.String(120), unique=False, nullable=False)
     followers=db.Column(db.Integer, nullable=True)
-    posts = db.relationship('Chat', backref='user')
+    posts = db.relationship('Post', backref='user')
 
     def serialize(self):
         return {
@@ -29,6 +29,7 @@ class User(db.Model):
         db.session.commit()
 
 """ class Chat(db.Model):
+
     __tablename__ = 'chats'
     id = db.Column(db.Integer, primary_key=True)
     message = db.Column(db.String(100), nullable=False)
@@ -55,11 +56,12 @@ class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
     commentary=db.Column(db.String(120), nullable=False)
-    users_id = db.Column(db.String(100), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False) 
+    user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False) 
 
     def serialize(self):
         return {
             "id": self.id,
+            "user_id": self.user_id,
             "commentary": self.commentary
         }
 
