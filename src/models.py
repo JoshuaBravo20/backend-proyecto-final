@@ -30,7 +30,6 @@ class User(db.Model):
         db.session.commit()
 
 class Chat(db.Model):
-
     __tablename__ = 'chats'
     id = db.Column(db.Integer, primary_key=True)
     message = db.Column(db.String(100))
