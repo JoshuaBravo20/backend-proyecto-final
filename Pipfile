@@ -19,6 +19,7 @@ gunicorn = "*"
 mysqlclient = "*"
 flask-admin = "*"
 pymysql = "*"
+flask-script = "*"
 
 [requires]
 python_version = "3.9.1"
