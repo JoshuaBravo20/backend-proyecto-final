@@ -8,7 +8,7 @@ class User(db.Model):
     name=db.Column(db.String(120), unique=False, nullable=False)
     email=db.Column(db.String(120), unique=False, nullable=False)
     followers=db.Column(db.Integer, nullable=True)
-    photo = db.Column(db.String(100), nullable=False)
+    photo = db.Column(db.String(255), nullable=False)
     posts = db.relationship('Post', backref='user')
     chats = db.relationship('Chat', backref='user')
 
@@ -66,10 +66,8 @@ class Post(db.Model):
             "id": self.id,
             "commentary": self.commentary,
             "user_id": self.user_id,
-            "user_name": self.user.name,
-            "user_photo": self.user.photo
-
-
+            "name": self.user.name,
+            "photo": self.user.photo
         }
 
     def save(self):
