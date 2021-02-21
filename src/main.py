@@ -101,7 +101,7 @@ def user(id = None):
         user = User.query.get(id)
         if not user: return jsonify({"msg": "User not found"}), 404
         user.delete()
-        return jsonify({"result": "User has deleted"}), 200
+        return jsonify({"result": "User has been deleted"}), 200
 
 @app.route('/api/posts', methods=['GET', 'POST'])
 @app.route('/api/post/<string:id>', methods=['GET', 'PUT', 'DELETE'])
@@ -154,7 +154,7 @@ def posts(id = None):
         post = Post.query.get(id)
         if not post: return jsonify({"msg": "Post not found"}), 404
         post.delete()
-        return jsonify({"result": "Post has deleted"}), 200 
+        return jsonify({"result": "Post has been deleted"}), 200 
 
     
 @app.route('/api/chats', methods=['GET', 'POST'])
@@ -190,7 +190,7 @@ def chats(id = None):
         chat = Chat.query.get(id)
         if not chat: return jsonify({"msg": "Chat not found"}), 404
         chat.delete()
-        return jsonify({"result": "Chat has deleted"}), 200
+        return jsonify({"result": "Chat has been deleted"}), 200
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
