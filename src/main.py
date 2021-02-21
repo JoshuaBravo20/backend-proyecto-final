@@ -61,6 +61,7 @@ def user(id = None):
         email = request.json.get("email")
         followers = request.json.get("followers")
         photo = request.json.get("photo")
+        recentTracks = request.json.get("recentTracks")
 
         if not user_id: return jsonify({"msg": "user_id is required"}), 400
         if not name: return jsonify({"msg": "name is required"}), 400
@@ -75,6 +76,7 @@ def user(id = None):
         user.email = email
         user.followers = followers
         user.photo = photo
+        user.recentTracks = recentTracks
         user.save()
         return jsonify(user.serialize()), 201
 
@@ -83,6 +85,7 @@ def user(id = None):
         email = request.json.get("email")
         followers = request.json.get("followers")
         photo = request.json.get("photo")
+        recentTracks = request.json.get("recentTracks")
 
         if not name: return jsonify({"msg": "name is required"}), 400
         if not email: return jsonify({"msg": "email is required"}), 400
@@ -93,6 +96,7 @@ def user(id = None):
         user.email = email
         user.followers = followers
         user.photo = photo
+        user.recentTracks = recentTracks
         user.update()
 
         user2 = User.query.filter_by(email=email).first()

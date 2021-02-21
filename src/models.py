@@ -9,6 +9,7 @@ class User(db.Model):
     email=db.Column(db.String(120), unique=False, nullable=False)
     followers=db.Column(db.Integer, nullable=True)
     photo = db.Column(db.String(255), nullable=False)
+    recentTracks = db.Column(db.PickleType, nullable=False)
     posts = db.relationship('Post', backref='user')
     chats = db.relationship('Chat', backref='user')
 
@@ -18,7 +19,8 @@ class User(db.Model):
             "name": self.name,
             "email": self.email,
             "followers": self.followers,
-            "photo": self.photo
+            "photo": self.photo,
+            "recentTracks": self.recentTracks
         }
     def save(self):
         db.session.add(self)
