@@ -60,6 +60,8 @@ def user(id = None):
         name = request.json.get("name")
         email = request.json.get("email")
         followers = request.json.get("followers")
+        photo = request.json.get("photo")
+        recentTracks = request.json.get("recentTracks")
 
         if not user_id: return jsonify({"msg": "user_id is required"}), 400
         if not name: return jsonify({"msg": "name is required"}), 400
@@ -73,6 +75,8 @@ def user(id = None):
         user.name = name
         user.email = email
         user.followers = followers
+        user.photo = photo
+        user.recentTracks = recentTracks
         user.save()
         return jsonify(user.serialize()), 201
 
@@ -80,7 +84,8 @@ def user(id = None):
         name = request.json.get("name")
         email = request.json.get("email")
         followers = request.json.get("followers")
-        print(followers)
+        photo = request.json.get("photo")
+        recentTracks = request.json.get("recentTracks")
 
         if not name: return jsonify({"msg": "name is required"}), 400
         if not email: return jsonify({"msg": "email is required"}), 400
@@ -90,6 +95,8 @@ def user(id = None):
         user.name = name
         user.email = email
         user.followers = followers
+        user.photo = photo
+        user.recentTracks = recentTracks
         user.update()
 
         user2 = User.query.filter_by(email=email).first()
@@ -118,18 +125,16 @@ def posts(id = None):
 
    
     if request.method == 'POST':
-        name = request.json.get("name")
         commentary = request.json.get("commentary")
         user_id = request.json.get("user_id")
         
-        if not name: return jsonify({"msg": "name is required"}), 400
         if not commentary: return jsonify({"msg": "commentary is required"}), 400
         if not user_id: return jsonify({"msg": "commentary is required"}), 400
 
         post = Post()
-        post.name = name
         post.commentary = commentary
         post.user_id = user_id
+
         post.save()
 
         return jsonify(post.serialize()), 201
