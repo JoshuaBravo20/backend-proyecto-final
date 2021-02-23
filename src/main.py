@@ -2,7 +2,8 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
-from flask import Flask, request, jsonify, url_for
+from flask import Flask, request, jsonify, url_for, render_template
+from flask_socketio import SocketIO
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from flask_swagger import swagger
@@ -14,6 +15,7 @@ from models import db, User, Post, Chat
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
+app.cofig["SECRET_KEY"] = "abc123"
 app.config['DEBUG'] = True
 app.config['ENV'] = 'development'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_CONNECTION_STRING')
@@ -24,6 +26,7 @@ MIGRATE = Migrate(app, db)
 CORS(app)
 setup_admin(app)
 manager = Manager(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 manager.add_command("db", MigrateCommand)
 
 
@@ -34,9 +37,21 @@ def handle_invalid_usage(error):
 
 # generate sitemap with all your endpoints
 
-""" @app.route("/")
+@app.route("/")
 def root():
-    return render_template('index.html') """
+    return render_template('index.html')
+
+""" @socketio.on("connected")
+def connected(data):
+    print(data)
+    
+
+@socketio.on('message')
+def handle_json(json, methods=["POST"]):
+    print('mensaje:' + str(json))
+    socketio.emit("response", json) """
+
+
 @app.route('/')
 def sitemap():
     return generate_sitemap(app)
@@ -205,3 +220,4 @@ def chats(id = None):
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 5000))
     app.run(host='localhost', port=PORT, debug=False)
+    socketio.run(app)
