@@ -20,6 +20,7 @@ mysqlclient = "*"
 flask-admin = "*"
 pymysql = "*"
 flask-script = "*"
+flask-socketio = "*"
 
 [requires]
 python_version = "3.9.1"

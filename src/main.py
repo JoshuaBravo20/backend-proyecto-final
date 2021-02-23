@@ -2,7 +2,8 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
-from flask import Flask, request, jsonify, url_for
+from flask import Flask, request, jsonify, url_for, render_template
+from flask_socketio import SocketIO
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from flask_swagger import swagger
@@ -15,9 +16,11 @@ from models import db, User, Post, Chat
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 app.config['DEBUG'] = True
+app.config['SECRET_KEY'] = 'secreto'
 app.config['ENV'] = 'development'
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_CONNECTION_STRING')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+socketio = SocketIO(app, cors_allowed_origins='*') # Inicializar Socket
 
 db.init_app(app)
 MIGRATE = Migrate(app, db)
@@ -26,7 +29,6 @@ setup_admin(app)
 manager = Manager(app)
 manager.add_command("db", MigrateCommand)
 
-
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
@@ -34,9 +36,14 @@ def handle_invalid_usage(error):
 
 # generate sitemap with all your endpoints
 
-""" @app.route("/")
-def root():
-    return render_template('index.html') """
+@socketio.on('connected')
+def connected(data):
+    print(data)
+
+@socketio.on('json')
+def get_message(json, method='POST'):
+    print("message", json)
+
 @app.route('/')
 def sitemap():
     return generate_sitemap(app)
@@ -62,6 +69,7 @@ def user(id = None):
         followers = request.json.get("followers")
         photo = request.json.get("photo")
         recentTracks = request.json.get("recentTracks")
+        topArtists = request.json.get("topArtists")
 
         if not user_id: return jsonify({"msg": "user_id is required"}), 400
         if not name: return jsonify({"msg": "name is required"}), 400
@@ -77,6 +85,7 @@ def user(id = None):
         user.followers = followers
         user.photo = photo
         user.recentTracks = recentTracks
+        user.topArtists = topArtists
         user.save()
         return jsonify(user.serialize()), 201
 
@@ -86,6 +95,7 @@ def user(id = None):
         followers = request.json.get("followers")
         photo = request.json.get("photo")
         recentTracks = request.json.get("recentTracks")
+        topArtists = request.json.get("topArtists")
 
         if not name: return jsonify({"msg": "name is required"}), 400
         if not email: return jsonify({"msg": "email is required"}), 400
@@ -97,7 +107,8 @@ def user(id = None):
         user.followers = followers
         user.photo = photo
         user.recentTracks = recentTracks
-        user.update()
+        user.topArtists = topArtists
+        user.update() 
 
         user2 = User.query.filter_by(email=email).first()
         if user2 and user2.user_id != id: return jsonify({"msg": "email already exists"}), 400

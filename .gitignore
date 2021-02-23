@@ -6,6 +6,7 @@ diagram.png
 public/*
 dist/*
 package.json
+migrations
+.vscode
 
 __pycache__/
-
