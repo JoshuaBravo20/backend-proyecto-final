@@ -3,6 +3,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 """
 import os
 from flask import Flask, request, jsonify, url_for
+from flask_socketio import SocketIO
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from flask_swagger import swagger
@@ -16,6 +17,7 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False
 app.config['DEBUG'] = True
 app.config['ENV'] = 'development'
+app.config["SECRET_KEY"] = "abc123"
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_CONNECTION_STRING')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -205,3 +207,4 @@ def chats(id = None):
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 5000))
     app.run(host='localhost', port=PORT, debug=False)
+    socketio.run(app)
