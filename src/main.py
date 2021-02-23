@@ -15,9 +15,9 @@ from models import db, User, Post, Chat
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
-app.cofig["SECRET_KEY"] = "abc123"
 app.config['DEBUG'] = True
 app.config['ENV'] = 'development'
+app.config["SECRET_KEY"] = "abc123"
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_CONNECTION_STRING')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -41,15 +41,20 @@ def handle_invalid_usage(error):
 def root():
     return render_template('index.html')
 
-""" @socketio.on("connected")
+
+
+@socketio.on('connected')
 def connected(data):
     print(data)
-    
+
 
 @socketio.on('message')
-def handle_json(json, methods=["POST"]):
-    print('mensaje:' + str(json))
-    socketio.emit("response", json) """
+def get_message(json, method=["POST"]):
+    print('received json: ' + str(json))
+
+    socketio.emit("response", json)
+
+
 
 
 @app.route('/')
@@ -220,4 +225,4 @@ def chats(id = None):
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 5000))
     app.run(host='localhost', port=PORT, debug=False)
-    socketio.run(app)
+    
