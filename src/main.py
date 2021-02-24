@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
-from flask import Flask, request, jsonify, url_for
+from flask import Flask, request, jsonify, url_for, render_template
 from flask_socketio import SocketIO
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
@@ -26,7 +26,21 @@ MIGRATE = Migrate(app, db)
 CORS(app)
 setup_admin(app)
 manager = Manager(app)
+socketio = SocketIO(app, cors_allowed_origins="*")
 manager.add_command("db", MigrateCommand)
+
+
+
+@socketio.on('connected')
+def connected(data):
+    print(data)
+
+
+@socketio.on("message")
+def get_message(json, methods=['POST']):
+    print("mensaje:" + str(json))
+    
+    socketio.emit("response", json)
 
 
 # Handle/serialize errors like a JSON object
