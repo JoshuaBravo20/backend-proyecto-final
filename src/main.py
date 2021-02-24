@@ -239,15 +239,15 @@ def get_friends(id = None):
 
     if request.method == 'POST':
         user_id = request.json.get("user_id")
-        friend =  request.json.get("friends")
+        friends =  request.json.get("friends")
         
         
-        if not friend: return jsonify({"msg": "friend is required"}), 400
+        if not friends: return jsonify({"msg": "friend is required"}), 400
         if not user_id: return jsonify({"msg": "id is required"}), 400
 
         newFriend = Friend()
         newFriend.user_id = user_id
-        newFriend.friends = friend
+        newFriend.friends = friends
         newFriend.save()
 
         return jsonify(newFriend.serialize()), 201
