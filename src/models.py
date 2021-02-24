@@ -90,15 +90,17 @@ class Post(db.Model):
 
 class Friend(db.Model):
     __tablename__ = 'friends'
-    id = db.Column(db.Integer, primary_key=True)
     friends = db.Column(db.String(250), nullable=False)
+    personId = db.Column(db.String(250), primary_key=True)
+    photo = db.Column(db.String(250), nullable=False)
     user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False) 
 
     def serialize(self):
         return {
-            "id": self.id,
             "friends": self.friends,
-            "user_id": self.user_id
+            "user_id": self.user_id,
+            "personId": self.personId,
+            "photo": self.photo
         }
 
     def save(self):

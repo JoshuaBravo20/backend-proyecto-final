@@ -223,8 +223,8 @@ def chats(id = None):
         return jsonify({"result": "Chat has been deleted"}), 200
 
 
-@app.route('/api/friends/', methods=['GET', 'POST', 'PUT'])
-@app.route('/api/friends/<string:id>', methods=['GET', 'POST', 'PUT'])
+@app.route('/api/friends/', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@app.route('/api/friends/<string:id>', methods=['GET', 'POST', 'DELETE'])
 def get_friends(id = None):
     if request.method == 'GET':
             if id is not None:
@@ -240,6 +240,8 @@ def get_friends(id = None):
     if request.method == 'POST':
         user_id = request.json.get("user_id")
         friends =  request.json.get("friends")
+        personId = request.json.get("personId")
+        photo = request.json.get("photo")
         
         
         if not friends: return jsonify({"msg": "friend is required"}), 400
@@ -248,12 +250,22 @@ def get_friends(id = None):
         newFriend = Friend()
         newFriend.user_id = user_id
         newFriend.friends = friends
+        newFriend.personId = personId
+        newFriend.photo = photo
         newFriend.save()
 
         return jsonify(newFriend.serialize()), 201
 
-    if request.method == 'PUT':
-        pass
+    if request.method == 'DELETE':
+        friend = Friend.query.get("personId")
+
+        if not friend: 
+            return jsonify({"msg": "not found"}), 400
+        else:
+            friend.delete()
+        return jsonify({"success": "deleted!"}), 200
+
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
