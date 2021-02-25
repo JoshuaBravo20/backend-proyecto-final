@@ -13,7 +13,7 @@ class User(db.Model):
     topArtists = db.Column(db.PickleType, nullable = False)
     posts = db.relationship('Post', backref='user')
     chats = db.relationship('Chat', backref='user')
-    friends = db.relationship('Friend', backref='user')
+    friends = db.relationship('Friend', cascade="all,delete", backref='user', uselist=False)
 
     def serialize(self):
         return {
@@ -93,7 +93,7 @@ class Friend(db.Model):
     personId = db.Column(db.String(250), primary_key=True)
     friends = db.Column(db.String(250), nullable=False)
     photo = db.Column(db.String(250), nullable=False)
-    user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False) 
+    user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE'), unique=True) 
 
     def serialize(self):
         return {

@@ -255,13 +255,14 @@ def chats(id = None):
 
 
 @app.route('/api/friends/', methods=['GET', 'POST', 'PUT', 'DELETE'])
-@app.route('/api/friends/<string:id>', methods=['GET', 'POST', 'DELETE'])
-def get_friends(id = None):
+@app.route('/api/friends/<string:user_id>', methods=['GET', 'POST', 'DELETE'])
+def get_friends(user_id = None):
     if request.method == 'GET':
-            if id is not None:
-                friend = Friend.query.get(id)
+            if user_id is not None:
+                friend = Friend.query.filter_by(user_id=user_id)
+                friend = list(map(lambda friend: friend.serialize(), friend))
                 if not friend: return jsonify({"msg": "friend not found"}), 404
-                return jsonify(friend.serialize()), 200
+                return jsonify(friend), 200
             else:
                 friend = Friend.query.all()
                 friend = list(map(lambda friend: friend.serialize(), friend))
