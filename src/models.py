@@ -9,10 +9,11 @@ class User(db.Model):
     email=db.Column(db.String(120), unique=False, nullable=False)
     followers=db.Column(db.Integer, nullable=True)
     photo = db.Column(db.String(255), nullable=False)
-    recentTracks = db.Column(db.PickleType, nullable=False)
-    topArtists = db.Column(db.PickleType, nullable=False)
+    recentTracks = db.Column(db.PickleType, nullable = False)
+    topArtists = db.Column(db.PickleType, nullable = False)
     posts = db.relationship('Post', backref='user')
     chats = db.relationship('Chat', backref='user')
+    friends = db.relationship('Friend', backref='user')
 
     def serialize(self):
         return {
@@ -24,6 +25,7 @@ class User(db.Model):
             "recentTracks": self.recentTracks,
             "topArtists": self.topArtists
         }
+
     def save(self):
         db.session.add(self)
         db.session.commit()
@@ -72,6 +74,33 @@ class Post(db.Model):
             "user_id": self.user_id,
             "name": self.user.name,
             "photo": self.user.photo
+        }
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+    
+    def update(self):
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+
+class Friend(db.Model):
+    __tablename__ = 'friends'
+    personId = db.Column(db.String(250), primary_key=True)
+    friends = db.Column(db.String(250), nullable=False)
+    photo = db.Column(db.String(250), nullable=False)
+    user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False) 
+
+    def serialize(self):
+        return {
+            "friends": self.friends,
+            "user_id": self.user_id,
+            "personId": self.personId,
+            "photo": self.photo
         }
 
     def save(self):

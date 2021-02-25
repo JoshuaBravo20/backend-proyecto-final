@@ -10,16 +10,18 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Post, Chat
+from models import db, User, Post, Chat, Friend
 #from models import Person
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 app.config['DEBUG'] = True
+app.config['SECRET_KEY'] = 'secreto'
 app.config['ENV'] = 'development'
 app.config["SECRET_KEY"] = "abc123"
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_CONNECTION_STRING')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+socketio = SocketIO(app, cors_allowed_origins='*') # Inicializar Socket
 
 db.init_app(app)
 MIGRATE = Migrate(app, db)
@@ -50,9 +52,26 @@ def handle_invalid_usage(error):
 
 # generate sitemap with all your endpoints
 
-""" @app.route("/")
+@app.route("/")
 def root():
-    return render_template('index.html') """
+    return render_template('index.html')
+
+
+
+@socketio.on('connected')
+def connected(data):
+    print(data)
+
+
+@socketio.on('message')
+def get_message(json, method=["POST"]):
+    print('received json: ' + str(json))
+
+    socketio.emit("response", json)
+
+
+
+
 @app.route('/')
 def sitemap():
     return generate_sitemap(app)
@@ -128,7 +147,7 @@ def user(id = None):
         user = User.query.get(id)
         if not user: return jsonify({"msg": "User not found"}), 404
         user.delete()
-        return jsonify({"result": "User has deleted"}), 200
+        return jsonify({"result": "User has been deleted"}), 200
 
 @app.route('/api/posts', methods=['GET', 'POST'])
 @app.route('/api/post/<string:id>', methods=['GET', 'PUT', 'DELETE'])
@@ -179,7 +198,7 @@ def posts(id = None):
         post = Post.query.get(id)
         if not post: return jsonify({"msg": "Post not found"}), 404
         post.delete()
-        return jsonify({"result": "Post has deleted"}), 200 
+        return jsonify({"result": "Post has been deleted"}), 200 
 
     
 @app.route('/api/chats', methods=['GET', 'POST'])
@@ -215,10 +234,53 @@ def chats(id = None):
         chat = Chat.query.get(id)
         if not chat: return jsonify({"msg": "Chat not found"}), 404
         chat.delete()
-        return jsonify({"result": "Chat has deleted"}), 200
+        return jsonify({"result": "Chat has been deleted"}), 200
+
+
+@app.route('/api/friends/', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@app.route('/api/friends/<string:id>', methods=['GET', 'POST', 'DELETE'])
+def get_friends(id = None):
+    if request.method == 'GET':
+            if id is not None:
+                friend = Friend.query.get(id)
+                if not friend: return jsonify({"msg": "friend not found"}), 404
+                return jsonify(friend.serialize()), 200
+            else:
+                friend = Friend.query.all()
+                friend = list(map(lambda friend: friend.serialize(), friend))
+                return jsonify(friend), 200
+
+
+    if request.method == 'POST':
+        user_id = request.json.get("user_id")
+        friends =  request.json.get("friends")
+        personId = request.json.get("personId")
+        photo = request.json.get("photo")
+        
+        
+        if not friends: return jsonify({"msg": "friend is required"}), 400
+        if not user_id: return jsonify({"msg": "id is required"}), 400
+
+        newFriend = Friend()
+        newFriend.user_id = user_id
+        newFriend.friends = friends
+        newFriend.personId = personId
+        newFriend.photo = photo
+        newFriend.save()
+
+        return jsonify(newFriend.serialize()), 201
+
+    if request.method == 'DELETE':
+        friend = Friend.query.get(id)
+        if not friend: return jsonify({"msg": "Chat not found"}), 404
+        friend.delete()
+        return jsonify({"result": "friend has been deleted"}), 200
+    
+
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 5000))
     app.run(host='localhost', port=PORT, debug=False)
-    socketio.run(app)
+    
