@@ -292,6 +292,8 @@ def get_friends(id = None):
         if not friend: return jsonify({"msg": "Chat not found"}), 404
         friend.delete()
         return jsonify({"result": "friend has been deleted"}), 200
+
+    
     
 
 
