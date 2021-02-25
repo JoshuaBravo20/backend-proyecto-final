@@ -38,7 +38,7 @@ class User(db.Model):
 class Chat(db.Model):
     __tablename__ = 'chats'
     id = db.Column(db.Integer, primary_key=True)
-    message = db.Column(db.String(100))
+    message = db.Column(db.PickleType)
     user_id = db.Column(db.String(100), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False) 
 
     def serialize(self):

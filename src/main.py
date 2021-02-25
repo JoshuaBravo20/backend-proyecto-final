@@ -3,7 +3,7 @@ This module takes care of starting the API Server, Loading the DB and Adding the
 """
 import os
 from flask import Flask, request, jsonify, url_for, render_template
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, join_room, leave_room
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from flask_swagger import swagger
@@ -43,16 +43,33 @@ def root():
 
 
 
+
+
 @socketio.on('connected')
 def connected(data):
     print(data)
 
-
 @socketio.on('message')
 def get_message(json, method=["POST"]):
     print('received json: ' + str(json))
-
     socketio.emit("response", json)
+
+
+@socketio.on('join')
+def on_join(data):
+    username = data['username']
+    room = data['room']
+    join_room(room)
+    socketio.send(username + ' has entered the room.', room=room)
+
+
+@socketio.on('leave')
+def on_leave(data):
+    username = data['username']
+    room = data['room']
+    leave_room(room)
+    send(username + ' has left the room.', room=room)
+
 
 
 
@@ -113,7 +130,7 @@ def user(id = None):
         if not name: return jsonify({"msg": "name is required"}), 400
         if not email: return jsonify({"msg": "email is required"}), 400
 
-
+    
         user = User.query.get(id)
         user.name = name
         user.email = email
@@ -225,4 +242,4 @@ def chats(id = None):
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 5000))
     app.run(host='localhost', port=PORT, debug=False)
-    
+   
