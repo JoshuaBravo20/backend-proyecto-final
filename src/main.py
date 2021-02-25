@@ -275,7 +275,7 @@ def get_friends(user_id = None):
         personId = request.json.get("personId")
         photo = request.json.get("photo")
         
-        
+    
         if not friends: return jsonify({"msg": "friend is required"}), 400
         if not user_id: return jsonify({"msg": "id is required"}), 400
 
