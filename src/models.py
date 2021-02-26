@@ -94,7 +94,7 @@ class Friend(db.Model):
     personId = db.Column(db.String(250),primary_key=True)
     friends = db.Column(db.String(250), nullable=False) 
     photo = db.Column(db.String(250), nullable=False)
-    user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE'), unique=True) 
+    user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE')) 
 
     def serialize(self):
         return {
