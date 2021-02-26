@@ -254,14 +254,13 @@ def chats(id = None):
         return jsonify({"result": "Chat has been deleted"}), 200
 
 
-@app.route('/api/friends/', methods=['GET', 'POST', 'PUT', 'DELETE'])
-@app.route('/api/friends/<string:user_id>', methods=['GET', 'POST', 'DELETE'])
+@app.route('/api/friends/', methods=['GET', 'POST'])
+@app.route('/api/friends/<string:user_id>', methods=['GET'])
 def get_friends(user_id = None):
     if request.method == 'GET':
             if user_id is not None:
-                friend = Friend.query.filter_by(user_id=user_id)
+                friend = Friend.query.filter_by(user_id=user_id).all()
                 friend = list(map(lambda friend: friend.serialize(), friend))
-                if not friend: return jsonify({"msg": "friend not found"}), 404
                 return jsonify(friend), 200
             else:
                 friend = Friend.query.all()
@@ -288,7 +287,10 @@ def get_friends(user_id = None):
 
         return jsonify(newFriend.serialize()), 201
 
+@app.route('/api/friends/<string:user_id>/<string:id>', methods=['DELETE'])
+def deleteFriend(user_id, id):
     if request.method == 'DELETE':
+        friend = Friend.query.filter_by(user_id=user_id).first()
         friend = Friend.query.get(id)
         if not friend: return jsonify({"msg": "Chat not found"}), 404
         friend.delete()
