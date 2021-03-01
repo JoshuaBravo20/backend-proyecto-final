@@ -40,7 +40,7 @@ class User(db.Model):
 class Chat(db.Model):
     __tablename__ = 'chats'
     id = db.Column(db.Integer, primary_key=True)
-    message = db.Column(db.String(100))
+    message = db.Column(db.PickleType)
     user_id = db.Column(db.String(100), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False) 
 
     def serialize(self):
@@ -90,13 +90,15 @@ class Post(db.Model):
 
 class Friend(db.Model):
     __tablename__ = 'friends'
-    personId = db.Column(db.String(250), primary_key=True)
-    friends = db.Column(db.String(250), nullable=False)
+    
+    personId = db.Column(db.String(250),primary_key=True)
+    friends = db.Column(db.String(250), nullable=False) 
     photo = db.Column(db.String(250), nullable=False)
-    user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE'), unique=True) 
+    user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE')) 
 
     def serialize(self):
         return {
+           
             "friends": self.friends,
             "user_id": self.user_id,
             "personId": self.personId,
