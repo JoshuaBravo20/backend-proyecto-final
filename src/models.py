@@ -11,9 +11,10 @@ class User(db.Model):
     photo = db.Column(db.String(255), nullable=False)
     recentTracks = db.Column(db.PickleType, nullable = False)
     topArtists = db.Column(db.PickleType, nullable = False)
-    posts = db.relationship('Post', backref='user')
-    chats = db.relationship('Chat', backref='user')
-    friends = db.relationship('Friend', cascade="all,delete", backref='user', uselist=False)
+    posts = db.relationship('Post', cascade="all,delete", backref='user')
+    chats = db.relationship('Chat', cascade="all,delete", backref='user')
+    #notificationLikes = db.relationship('NotificationLike', cascade="all,delete", backref='user')
+    friends = db.relationship('Friend', cascade="all,delete", backref='user')
 
     def serialize(self):
         return {
@@ -64,13 +65,15 @@ class Chat(db.Model):
 class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
-    commentary=db.Column(db.String(120))
+    commentary = db.Column(db.String(120))
+    image  = db.Column(db.String(100), nullable=False)
     user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False) 
 
     def serialize(self):
         return {
             "id": self.id,
             "commentary": self.commentary,
+            "image": self.image,
             "user_id": self.user_id,
             "name": self.user.name,
             "photo": self.user.photo
@@ -115,3 +118,32 @@ class Friend(db.Model):
     def delete(self):
         db.session.delete(self)
         db.session.commit()
+
+# class NotificationLike(db.Model):
+#     __tablename__ = 'notificationLikes'
+    
+#     id = db.Column(db.Integer, primary_key=True)
+#     message = db.Column(db.String(250), nullable=False) 
+#     active = db.Column(db.Boolean)
+#     personId = db.Column(db.String(250), nullable=False)
+#     user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE')) 
+
+#     def serialize(self):
+#         return {
+           
+#             "message": self.message,
+#             "personId": self.personId,
+#             "active": self.active,
+#             "user_id": self.user_id,
+#         }
+
+#     def save(self):
+#         db.session.add(self)
+#         db.session.commit()
+    
+#     def update(self):
+#         db.session.commit()
+
+#     def delete(self):
+#         db.session.delete(self)
+#         db.session.commit()

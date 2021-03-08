@@ -8,18 +8,26 @@ from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 from flask_swagger import swagger
 from flask_cors import CORS
+from dotenv import load_dotenv
 from utils import APIException, generate_sitemap
 from admin import setup_admin
 from models import db, User, Post, Chat, Friend
+from libs import img_type_file
+from werkzeug.utils import secure_filename
 #from models import Person
+
+load_dotenv()
+
+IMG_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
-app.config['DEBUG'] = True
+app.config['DEBUG'] = False
 app.config['SECRET_KEY'] = 'secreto'
 app.config['ENV'] = 'development'
 app.config["SECRET_KEY"] = "abc123"
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_CONNECTION_STRING')
+app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 socketio = SocketIO(app, cors_allowed_origins='*') # Inicializar Socket
 
@@ -181,14 +189,26 @@ def posts(id = None):
 
    
     if request.method == 'POST':
-        commentary = request.json.get("commentary")
-        user_id = request.json.get("user_id")
+        commentary = request.form.get("commentary")
+        user_id = request.form.get("user_id")
         
-        if not commentary: return jsonify({"msg": "commentary is required"}), 400
-        if not user_id: return jsonify({"msg": "commentary is required"}), 400
+        if not commentary: 
+            return jsonify({"msg": "commentary is required"}), 400
+        if not user_id: 
+            return jsonify({"msg": "commentary is required"}), 400
+
+        image = request.files['image']
+
+        if image:
+             image_filename = secure_filename(image.filename)
+             image.save(os.path.join(
+                 app.config['UPLOAD_FOLDER'] + "\\pictures", image_filename))
+        else:
+            return jsonify({"msg": "Extension not allowed"}), 400
 
         post = Post()
         post.commentary = commentary
+        post.image = image_filename
         post.user_id = user_id
 
         post.save()
