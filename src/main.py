@@ -191,6 +191,7 @@ def posts(id = None):
     if request.method == 'POST':
         commentary = request.form.get("commentary")
         user_id = request.form.get("user_id")
+        path = request.form.get("path")
         
         if not commentary: 
             return jsonify({"msg": "commentary is required"}), 400
@@ -199,10 +200,10 @@ def posts(id = None):
 
         image = request.files['image']
 
-        if image:
+        if image and img_type_file(image.filename, IMG_EXTENSIONS):
              image_filename = secure_filename(image.filename)
              image.save(os.path.join(
-                 app.config['UPLOAD_FOLDER'] + "\\pictures", image_filename))
+                path, image_filename))
         else:
             return jsonify({"msg": "Extension not allowed"}), 400
 
@@ -210,6 +211,7 @@ def posts(id = None):
         post.commentary = commentary
         post.image = image_filename
         post.user_id = user_id
+        post.path = path
 
         post.save()
 
