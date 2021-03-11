@@ -15,6 +15,7 @@ class User(db.Model):
     chats = db.relationship('Chat', cascade="all,delete", backref='user')
     #notificationLikes = db.relationship('NotificationLike', cascade="all,delete", backref='user')
     friends = db.relationship('Friend', cascade="all,delete", backref='user')
+    likes = db.relationship('LikesPost', cascade="all,delete", backref='user')
 
     def serialize(self):
         return {
@@ -65,9 +66,10 @@ class Chat(db.Model):
 class Post(db.Model):
     __tablename__ = 'posts'
     id = db.Column(db.Integer, primary_key=True)
-    commentary = db.Column(db.String(120))
+    commentary = db.Column(db.String(120), nullable=False)
     image  = db.Column(db.String(100), nullable=False)
-    user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False) 
+    user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False)
+    likes = db.relationship('LikesPost', cascade="all,delete", backref='posts') 
 
     def serialize(self):
         return {
@@ -78,6 +80,7 @@ class Post(db.Model):
             "name": self.user.name,
             "photo": self.user.photo
         }
+
 
     def save(self):
         db.session.add(self)
@@ -90,11 +93,39 @@ class Post(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+class LikesPost(db.Model):
+    __tablename__ = 'likespost'
+    id = db.Column(db.Integer, primary_key=True)
+    likes  = db.Column(db.Integer, nullable=False)
+    active = db.Column(db.Boolean, nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id',ondelete='CASCADE'), nullable=False)
+    user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False) 
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "likes": self.likes,
+            "active": self.active,
+            "user_id": self.user_id,
+            "post_id": self.post_id
+        }
+
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+    
+    def update(self):
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
 class Friend(db.Model):
     __tablename__ = 'friends'
-    
-    personId = db.Column(db.String(250),primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
+    personId = db.Column(db.String(250), nullable=False)
     friends = db.Column(db.String(250), nullable=False) 
     photo = db.Column(db.String(250), nullable=False)
     user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE')) 

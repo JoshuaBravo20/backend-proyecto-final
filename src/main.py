@@ -11,7 +11,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Post, Chat, Friend
+from models import db, User, Post, Chat, Friend, LikesPost
 from libs import img_type_file
 from werkzeug.utils import secure_filename
 #from models import Person
@@ -174,7 +174,7 @@ def user(id = None):
         return jsonify({"result": "User has been deleted"}), 200
 
 @app.route('/api/posts', methods=['GET', 'POST'])
-@app.route('/api/post/<string:id>', methods=['GET', 'PUT', 'DELETE'])
+@app.route('/api/post/<string:user_id>', methods=['GET', 'PUT', 'DELETE'])
 def posts(id = None):
     if request.method == 'GET':
         if id is not None:
@@ -217,28 +217,75 @@ def posts(id = None):
         return jsonify(post.serialize()), 201
 
     """ if request.method == 'PUT':
-        commentary = request.json.get("commentary")
-        user_id = request.json.get("user_id")
+        your_commentary = request.json.get("your_commentary")
+        likes = request.json.get("likes")
 
         if not commentary: return jsonify({"msg": "Commentary is required"}), 400
         if not user_id: return jsonify({"msg": "Commentary is required"}), 400
 
 
-        post = Post.query.get(id)
-        post.commentary = commentary
-        post.user_id = user_id
+        post = Post.query.get(user_id)
+        post.your_commentary = your_commentary
+        post.likes = likes
         post.update()
 
                 
-        return jsonify(post.serialize()), 200    """
+        return jsonify(post.serialize_with_likes_commentary()), 200   
 
     if request.method == 'DELETE':
-        post = Post.query.get(id)
+        post = Post.query.get(user_id)
         if not post: return jsonify({"msg": "Post not found"}), 404
         post.delete()
-        return jsonify({"result": "Post has been deleted"}), 200 
+        return jsonify({"result": "Post has been deleted"}), 200  """
 
-    
+@app.route('/api/likespost', methods=['GET', 'POST'])
+@app.route('/api/likespost/<string:id>', methods=['GET', 'PUT'])
+def likepost(id = None):
+    if request.method == 'GET':
+        if id is not None:
+            likepost = LikesPost.query.get(id)
+            if not likepost: return jsonify({"msg": "Like not found"}), 404
+            return jsonify(likepost.serialize()), 200
+        else:
+            likespost = LikesPost.query.all()
+            likespost = list(map(lambda likespost: likespost.serialize(), likespost))
+            return jsonify(likespost), 200
+
+    if request.method == 'POST':
+        likes = request.json.get("likes")
+        active = request.json.get("active")
+        post_id = request.json.get("post_id")
+        user_id = request.json.get("user_id")
+        
+        if not post_id: 
+            return jsonify({"msg": "user is required"}), 400
+        if not user_id: 
+            return jsonify({"msg": "user is required"}), 400
+
+        likespost = LikesPost()
+        likespost.likes = likes
+        likespost.active = active
+        likespost.post_id = post_id
+        likespost.user_id = user_id
+
+        likespost.save()
+
+        return jsonify(likespost.serialize()), 201
+
+    if request.method == 'PUT':
+        likes = request.json.get("likes")
+        active = request.json.get("active")
+
+        likespost = LikesPost()
+        likespost.likes = likes
+        likespost.active = active
+
+        likespost.update()
+
+                
+        return jsonify(likespost.serialize()), 200   
+
+
 @app.route('/api/chats', methods=['GET', 'POST'])
 @app.route('/api/chat/<string:id>', methods=['GET', 'PUT', 'DELETE'])
 def chats(id = None):
