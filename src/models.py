@@ -99,7 +99,7 @@ class LikesPost(db.Model):
     likes  = db.Column(db.Integer, nullable=False)
     active = db.Column(db.Boolean, nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id',ondelete='CASCADE'), nullable=False)
-    user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False) 
+    user_id = db.Column(db.String(100), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False) 
 
     def serialize(self):
         return {
