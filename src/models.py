@@ -16,6 +16,7 @@ class User(db.Model):
     #notificationLikes = db.relationship('NotificationLike', cascade="all,delete", backref='user')
     friends = db.relationship('Friend', cascade="all,delete", backref='user')
     likes = db.relationship('LikesPost', cascade="all,delete", backref='user')
+    commentsPost = db.relationship('CommentaryPost', cascade="all,delete", backref='user')
 
     def serialize(self):
         return {
@@ -70,6 +71,7 @@ class Post(db.Model):
     image  = db.Column(db.String(100), nullable=False)
     user_id = db.Column(db.String(120), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False)
     likes = db.relationship('LikesPost', cascade="all,delete", backref='posts') 
+    commentaryPost = db.relationship('CommentaryPost', cascade="all,delete", backref='posts') 
 
     def serialize(self):
         return {
@@ -108,6 +110,33 @@ class LikesPost(db.Model):
             "active": self.active,
             "user_id": self.user_id,
             "post_id": self.post_id
+        }
+
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+    
+    def update(self):
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+class CommentaryPost(db.Model):
+    __tablename__ = 'commentsPost'
+    id = db.Column(db.Integer, primary_key=True)
+    commentary  = db.Column(db.String(250), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id',ondelete='CASCADE'), nullable=False)
+    user_id = db.Column(db.String(100), db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False) 
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "commentary": self.commentary,
+            "post_id": self.post_id,
+            "user_id": self.user_id
         }
 
 

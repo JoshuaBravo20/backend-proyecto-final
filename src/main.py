@@ -11,7 +11,7 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Post, Chat, Friend, LikesPost
+from models import db, User, Post, Chat, Friend, LikesPost, CommentaryPost
 from libs import img_type_file
 from werkzeug.utils import secure_filename
 #from models import Person
@@ -285,6 +285,40 @@ def likepost(id = None):
                 
         return jsonify(likespost.serialize()), 200   
 
+@app.route('/api/commentspost', methods=['GET', 'POST'])
+@app.route('/api/commentspost/<string:id>', methods=['GET', 'PUT'])
+def commentsPost(id = None):
+    if request.method == 'GET':
+        if id is not None:
+            commentsPost = CommentaryPost.query.get(id)
+            if not commentsPost: return jsonify({"msg": "commentsPost not found"}), 404
+            return jsonify(commentsPost.serialize()), 200
+        else:
+            commentsPost = CommentaryPost.query.all()
+            commentsPost = list(map(lambda commentsPost: commentsPost.serialize(), commentsPost))
+            return jsonify(commentsPost), 200
+
+    if request.method == 'POST':
+        commentary = request.json.get("commentary")
+        post_id = request.json.get("post_id")
+        user_id = request.json.get("user_id")
+        
+        if not post_id: 
+            return jsonify({"msg": "user is required"}), 400
+        if not user_id: 
+            return jsonify({"msg": "user is required"}), 400
+
+        commentsPost = CommentaryPost()
+        commentsPost.commentary = commentary
+        commentsPost.post_id = post_id
+        commentsPost.user_id = user_id
+
+        commentsPost.save()
+
+        return jsonify(commentsPost.serialize()), 201
+
+                
+        return jsonify(likespost.serialize()), 200
 
 @app.route('/api/chats', methods=['GET', 'POST'])
 @app.route('/api/chat/<string:id>', methods=['GET', 'PUT', 'DELETE'])
