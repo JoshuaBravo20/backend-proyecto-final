@@ -136,6 +136,8 @@ class CommentaryPost(db.Model):
             "id": self.id,
             "commentary": self.commentary,
             "post_id": self.post_id,
+            "photo": self.user.photo,
+            "name": self.user.name,
             "user_id": self.user_id
         }
 
@@ -161,7 +163,7 @@ class Friend(db.Model):
 
     def serialize(self):
         return {
-           
+            "id": self.id,
             "friends": self.friends,
             "user_id": self.user_id,
             "personId": self.personId,

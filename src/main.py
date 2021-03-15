@@ -303,6 +303,8 @@ def commentsPost(id = None):
         post_id = request.json.get("post_id")
         user_id = request.json.get("user_id")
         
+        if not commentary: 
+            return jsonify({"msg": "commentary is required"}), 400
         if not post_id: 
             return jsonify({"msg": "user is required"}), 400
         if not user_id: 
@@ -316,9 +318,6 @@ def commentsPost(id = None):
         commentsPost.save()
 
         return jsonify(commentsPost.serialize()), 201
-
-                
-        return jsonify(likespost.serialize()), 200
 
 @app.route('/api/chats', methods=['GET', 'POST'])
 @app.route('/api/chat/<string:id>', methods=['GET', 'PUT', 'DELETE'])
@@ -385,16 +384,16 @@ def get_friends(user_id = None):
         newFriend.friends = friends
         newFriend.personId = personId
         newFriend.photo = photo
+
         newFriend.save()
 
         return jsonify(newFriend.serialize()), 201
 
-@app.route('/api/friends/<string:user_id>/<string:id>', methods=['DELETE'])
-def deleteFriend(user_id, id):
+@app.route('/api/friends/<string:user_id>/<string:personId>/', methods=['DELETE'])
+def deleteFriend(user_id, personId):
     if request.method == 'DELETE':
-        friend = Friend.query.filter_by(user_id=user_id).first()
-        friend = Friend.query.get(id)
-        if not friend: return jsonify({"msg": "Chat not found"}), 404
+        friend = Friend.query.filter_by(user_id=user_id, personId=personId).first()
+        if not friend: return jsonify({"msg": "friend not found"}), 404
         friend.delete()
         return jsonify({"result": "friend has been deleted"}), 200
 
