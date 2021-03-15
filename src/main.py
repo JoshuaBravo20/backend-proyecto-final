@@ -354,7 +354,6 @@ def chats(id = None):
         chat.delete()
         return jsonify({"result": "Chat has been deleted"}), 200
 
-
 @app.route('/api/friends/', methods=['GET', 'POST'])
 @app.route('/api/friends/<string:user_id>', methods=['GET'])
 def get_friends(user_id = None):
@@ -367,7 +366,6 @@ def get_friends(user_id = None):
                 friend = Friend.query.all()
                 friend = list(map(lambda friend: friend.serialize(), friend))
                 return jsonify(friend), 200
-
 
     if request.method == 'POST':
         user_id = request.json.get("user_id")
@@ -398,10 +396,6 @@ def deleteFriend(user_id, personId):
         return jsonify({"result": "friend has been deleted"}), 200
 
     
-    
-
-
-
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 5000))
