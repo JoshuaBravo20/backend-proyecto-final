@@ -332,7 +332,6 @@ def chats(id = None):
             chat = list(map(lambda chat: chat.serialize(), chat))
             return jsonify(chat), 200
 
-   
     if request.method == 'POST':
         user_id = request.json.get("user_id")
         message = request.json.get("message")
